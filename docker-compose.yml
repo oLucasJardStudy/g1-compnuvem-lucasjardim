@@ -1,0 +1,40 @@
+x-app-base: &app-base
+  build: ./app
+  image: msg-app:1.0
+  restart: unless-stopped
+  networks:
+    - msgnet
+  volumes:
+    - msgdata:/data
+
+services:
+  app1:
+    <<: *app-base
+    environment:
+      INSTANCE_NAME: app1
+      PEERS: "app2,app3"
+    ports:
+      - "5001:5000"
+
+  app2:
+    <<: *app-base
+    environment:
+      INSTANCE_NAME: app2
+      PEERS: "app1,app3"
+    ports:
+      - "5002:5000"
+
+  app3:
+    <<: *app-base
+    environment:
+      INSTANCE_NAME: app3
+      PEERS: "app1,app2"
+    ports:
+      - "5003:5000"
+
+networks:
+  msgnet:
+    driver: bridge
+
+volumes:
+  msgdata:
